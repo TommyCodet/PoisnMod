@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -39,8 +38,8 @@ public final class PoisnModClient implements ClientModInitializer {
                     new InputStreamReader(stream, StandardCharsets.UTF_8), type);
             if (entries == null) return;
             for (MemberEntry entry : entries) {
-                if (entry != null && entry.player != null && !entry.player.isEmpty()) {
-                    MEMBERS.put(entry.player, entry);
+                if (entry != null && entry.Player != null && !entry.Player.isEmpty()) {
+                    MEMBERS.put(entry.Player, entry);
                 }
             }
         } catch (Exception exception) {
@@ -66,7 +65,6 @@ public final class PoisnModClient implements ClientModInitializer {
         public String UnterNamen = "";
         public String FarbeUN = "";
 
-        public String player() { return Player == null ? "" : Player; }
         public String above() { return UeberNamen == null ? "" : UeberNamen; }
         public String aboveColor() { return FarbeUeN == null ? "" : FarbeUeN; }
         public String below() { return UnterNamen == null ? "" : UnterNamen; }
