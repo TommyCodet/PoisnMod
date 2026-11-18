@@ -1,12 +1,12 @@
 package net.poisn.poisnmod.mixin;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.poisn.poisnmod.PoisnModClient;
 import net.poisn.poisnmod.PoisnModClient.MemberEntry;
 import org.spongepowered.asm.mixin.Mixin;
