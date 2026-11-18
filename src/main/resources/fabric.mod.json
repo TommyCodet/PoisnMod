@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "poisnmod",
+  "version": "${version}",
+  "name": "PoisnMod",
+  "description": "Client-side extra player nameplate labels for HugoSMP.",
+  "authors": ["TommyCodet"],
+  "contact": {
+    "sources": "https://github.com/TommyCodet/PoisnMod"
+  },
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "net.poisn.poisnmod.PoisnModClient"
+    ]
+  },
+  "mixins": [
+    {
+      "config": "poisnmod.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=0.19.3",
+    "minecraft": "26.2",
+    "java": ">=25",
+    "fabric-api": "*"
+  }
+}
