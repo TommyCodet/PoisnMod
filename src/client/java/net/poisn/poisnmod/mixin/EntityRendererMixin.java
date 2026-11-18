@@ -28,11 +28,11 @@ public abstract class EntityRendererMixin {
         String above = entry.above();
         String below = entry.below();
         if (!above.isBlank()) {
-            collector.submitNameTag(poseStack, state.nameTagAttachment, 10,
+            collector.submitNameTag(poseStack, state.nameTagAttachment, -10,
                     colored(above, entry.aboveColor()), false, state.lightCoords, camera);
         }
         if (!below.isBlank()) {
-            collector.submitNameTag(poseStack, state.nameTagAttachment, -10,
+            collector.submitNameTag(poseStack, state.nameTagAttachment, 10,
                     colored(below, entry.belowColor()), false, state.lightCoords, camera);
         }
     }
