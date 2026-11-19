@@ -3,7 +3,8 @@
   "package": "net.poisn.poisnmod.mixin",
   "compatibilityLevel": "JAVA_25",
   "client": [
-    "EntityRendererMixin"
+    "EntityRendererMixin",
+    "AvatarRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
