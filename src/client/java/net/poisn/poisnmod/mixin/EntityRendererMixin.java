@@ -24,7 +24,8 @@ public abstract class EntityRendererMixin {
         if (!PoisnModClient.isHugoServer() || !PoisnModClient.isClanNameplatesEnabled() || state.nameTag == null || state.nameTagAttachment == null) return;
         if (!(state instanceof AvatarRenderState playerState)) return;
 
-        String playerName = playerState.name;
+        String playerName = PoisnModClient.playerNameFor(playerState);
+        if (playerName == null) playerName = state.nameTag.getString();
         if (playerName == null || playerName.isBlank()) return;
         MemberEntry entry = PoisnModClient.find(playerName);
         if (entry == null) return;
