@@ -31,14 +31,36 @@ public final class PoisnModClient implements ClientModInitializer {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Map<String, MemberEntry> MEMBERS = new HashMap<>();
     private static final Path CONFIG_FILE = Path.of("config", "poisnmod-members.json");
+    private static final Path SETTINGS_FILE = Path.of("config", "poisnmod.json");
     private static ModConfig config = new ModConfig();
 
     @Override
     public void onInitializeClient() {
+        loadSettings();
         loadMembers();
         HudElementRegistry.addLast(Identifier.fromNamespaceAndPath(MOD_ID, "clan_hud"), PoisnModClient::renderClanHud);
         LOGGER.info("PoisnMod loaded {} clan members.", MEMBERS.size());
     }
+
+    private static void loadSettings() {
+        try {
+            Files.createDirectories(SETTINGS_FILE.getParent());
+            if (Files.exists(SETTINGS_FILE)) {
+                try (var reader = Files.newBufferedReader(SETTINGS_FILE, StandardCharsets.UTF_8)) {
+                    ModConfig loaded = GSON.fromJson(reader, ModConfig.class);
+                    if (loaded != null) config = loaded;
+                }
+            } else {
+                Files.writeString(SETTINGS_FILE, GSON.toJson(config), StandardCharsets.UTF_8);
+            }
+            config.maxHudMembers = Math.max(1, Math.min(20, config.maxHudMembers));
+        } catch (Exception exception) {
+            LOGGER.error("Could not load config/poisnmod.json; using defaults.", exception);
+        }
+    }
+
+    public static boolean isClanNameplatesEnabled() { return config.showClanNameplates; }
+    public static boolean isMemberHighlightEnabled() { return config.highlightMembers; }
 
     private static void loadMembers() {
         try {
@@ -104,7 +126,7 @@ public final class PoisnModClient implements ClientModInitializer {
 
         List<String> online = new ArrayList<>();
         for (var player : minecraft.level.players()) {
-            MemberEntry member = find(player.getGameProfile().name());
+            MemberEntry member = find(player.getName().getString());
             if (member != null) online.add(member.role().isBlank() ? member.Player : member.role() + " " + member.Player);
         }
         if (online.isEmpty()) return;
