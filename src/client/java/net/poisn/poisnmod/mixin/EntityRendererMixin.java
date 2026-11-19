@@ -3,6 +3,7 @@ package net.poisn.poisnmod.mixin;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.network.chat.Component;
@@ -20,20 +21,24 @@ public abstract class EntityRendererMixin {
     private void poisnmod$submitExtraNameplate(EntityRenderState state, PoseStack poseStack,
                                                 SubmitNodeCollector collector, CameraRenderState camera,
                                                 CallbackInfo ci) {
-        if (!PoisnModClient.isHugoServer() || state.nameTag == null) return;
+        if (!PoisnModClient.isHugoServer() || !PoisnModClient.isClanNameplatesEnabled() || state.nameTag == null || state.nameTagAttachment == null) return;
+        if (!(state instanceof AvatarRenderState playerState)) return;
 
-        MemberEntry entry = PoisnModClient.find(state.nameTag.getString());
+        String playerName = PoisnModClient.playerNameFor(playerState);
+        if (playerName == null) playerName = state.nameTag.getString();
+        if (playerName == null || playerName.isBlank()) return;
+        MemberEntry entry = PoisnModClient.find(playerName);
         if (entry == null) return;
 
         String above = entry.above();
         String below = entry.below();
         if (!above.isBlank()) {
             collector.submitNameTag(poseStack, state.nameTagAttachment, -10,
-                    colored(above, entry.aboveColor()), false, state.lightCoords, camera);
+                    colored(above, entry.aboveColor()), !state.isDiscrete, state.lightCoords, camera);
         }
         if (!below.isBlank()) {
             collector.submitNameTag(poseStack, state.nameTagAttachment, 10,
-                    colored(below, entry.belowColor()), false, state.lightCoords, camera);
+                    colored(below, entry.belowColor()), !state.isDiscrete, state.lightCoords, camera);
         }
     }
 
@@ -44,27 +49,13 @@ public abstract class EntityRendererMixin {
     private static int parseColor(String raw) {
         if (raw == null || raw.isBlank()) return 0xFFFFFF;
         String value = raw.trim();
-        if (value.matches("(?i)#[0-9a-f]{6}")) {
-            return Integer.parseInt(value.substring(1), 16);
-        }
+        if (value.matches("(?i)#[0-9a-f]{6}")) return Integer.parseInt(value.substring(1), 16);
         if (value.startsWith("&") && value.length() >= 2) {
             return switch (Character.toLowerCase(value.charAt(1))) {
-                case '0' -> 0x000000;
-                case '1' -> 0x0000AA;
-                case '2' -> 0x00AA00;
-                case '3' -> 0x00AAAA;
-                case '4' -> 0xAA0000;
-                case '5' -> 0xAA00AA;
-                case '6' -> 0xFFAA00;
-                case '7' -> 0xAAAAAA;
-                case '8' -> 0x555555;
-                case '9' -> 0x5555FF;
-                case 'a' -> 0x55FF55;
-                case 'b' -> 0x55FFFF;
-                case 'c' -> 0xFF5555;
-                case 'd' -> 0xFF55FF;
-                case 'e' -> 0xFFFF55;
-                case 'f' -> 0xFFFFFF;
+                case '0' -> 0x000000; case '1' -> 0x0000AA; case '2' -> 0x00AA00; case '3' -> 0x00AAAA;
+                case '4' -> 0xAA0000; case '5' -> 0xAA00AA; case '6' -> 0xFFAA00; case '7' -> 0xAAAAAA;
+                case '8' -> 0x555555; case '9' -> 0x5555FF; case 'a' -> 0x55FF55; case 'b' -> 0x55FFFF;
+                case 'c' -> 0xFF5555; case 'd' -> 0xFF55FF; case 'e' -> 0xFFFF55; case 'f' -> 0xFFFFFF;
                 default -> 0xFFFFFF;
             };
         }
