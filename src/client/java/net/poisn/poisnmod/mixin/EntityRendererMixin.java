@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.entity.state.PlayerRenderState;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
@@ -20,20 +21,35 @@ public abstract class EntityRendererMixin {
     private void poisnmod$submitExtraNameplate(EntityRenderState state, PoseStack poseStack,
                                                 SubmitNodeCollector collector, CameraRenderState camera,
                                                 CallbackInfo ci) {
-        if (!PoisnModClient.isHugoServer() || state.nameTag == null) return;
+        if (!PoisnModClient.isHugoServer() || state.nameTag == null || state.nameTagAttachment == null) {
+            return;
+        }
 
-        MemberEntry entry = PoisnModClient.find(state.nameTag.getString());
-        if (entry == null) return;
+        // The rendered name tag can contain a display name, formatting or a server prefix.
+        // Match the configured member list against the actual account name instead.
+        if (!(state instanceof PlayerRenderState playerState)) {
+            return;
+        }
+
+        String playerName = playerState.name;
+        if (playerName == null || playerName.isBlank()) {
+            return;
+        }
+
+        MemberEntry entry = PoisnModClient.find(playerName);
+        if (entry == null) {
+            return;
+        }
 
         String above = entry.above();
         String below = entry.below();
         if (!above.isBlank()) {
             collector.submitNameTag(poseStack, state.nameTagAttachment, -10,
-                    colored(above, entry.aboveColor()), false, state.lightCoords, camera);
+                    colored(above, entry.aboveColor()), !state.isDiscrete, state.lightCoords, camera);
         }
         if (!below.isBlank()) {
             collector.submitNameTag(poseStack, state.nameTagAttachment, 10,
-                    colored(below, entry.belowColor()), false, state.lightCoords, camera);
+                    colored(below, entry.belowColor()), !state.isDiscrete, state.lightCoords, camera);
         }
     }
 
