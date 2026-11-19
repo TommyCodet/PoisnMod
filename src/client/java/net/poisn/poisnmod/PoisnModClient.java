@@ -24,12 +24,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 public final class PoisnModClient implements ClientModInitializer {
     public static final String MOD_ID = "poisnmod";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Map<String, MemberEntry> MEMBERS = new HashMap<>();
+    private static final Map<AvatarRenderState, String> PLAYER_NAMES = new WeakHashMap<>();
     private static final Path CONFIG_FILE = Path.of("config", "poisnmod-members.json");
     private static final Path SETTINGS_FILE = Path.of("config", "poisnmod.json");
     private static ModConfig config = new ModConfig();
@@ -106,6 +108,12 @@ public final class PoisnModClient implements ClientModInitializer {
             LOGGER.error("Could not read bundled member list.", exception);
         }
     }
+
+    public static void rememberPlayerName(AvatarRenderState state, String playerName) {
+        if (state != null && playerName != null && !playerName.isBlank()) PLAYER_NAMES.put(state, playerName);
+    }
+
+    public static String playerNameFor(AvatarRenderState state) { return PLAYER_NAMES.get(state); }
 
     public static MemberEntry find(String playerName) {
         if (playerName == null) return null;
