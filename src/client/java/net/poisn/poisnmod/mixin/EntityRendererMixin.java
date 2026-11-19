@@ -21,7 +21,7 @@ public abstract class EntityRendererMixin {
     private void poisnmod$submitExtraNameplate(EntityRenderState state, PoseStack poseStack,
                                                 SubmitNodeCollector collector, CameraRenderState camera,
                                                 CallbackInfo ci) {
-        if (!PoisnModClient.isHugoServer() || state.nameTag == null || state.nameTagAttachment == null) return;
+        if (!PoisnModClient.isHugoServer() || !PoisnModClient.isClanNameplatesEnabled() || state.nameTag == null || state.nameTagAttachment == null) return;
         if (!(state instanceof AvatarRenderState playerState)) return;
 
         String playerName = playerState.name;
